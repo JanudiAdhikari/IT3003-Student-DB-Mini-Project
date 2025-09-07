@@ -20,6 +20,7 @@ It supports full **CRUD operations** and extra features like:
 ---
 
 ## 📂 Project Structure
+```
 IT3003-Student-DB-Mini-Project/
 │── pom.xml
 │── README.md
