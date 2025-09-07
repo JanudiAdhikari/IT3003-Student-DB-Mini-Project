@@ -1,11 +1,15 @@
 package com.example.studentdb.dao;
 
-import com.example.studentdb.db.DatabaseConnection;
-import com.example.studentdb.model.Student;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.studentdb.db.DatabaseConnection;
+import com.example.studentdb.model.Student;
 
 public class StudentDAO {
 
@@ -13,8 +17,7 @@ public class StudentDAO {
     public void addStudent(Student student) {
         String sql = "INSERT INTO students (name, email, phone, dob, address) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, student.getName());
             stmt.setString(2, student.getEmail());
@@ -26,6 +29,12 @@ public class StudentDAO {
             System.out.println("✅ Student added successfully!");
 
         } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) {
+                // Duplicate entry for email (MySQL error code 1062)
+                System.out.println("⚠️ Email already exists! Please use a different email.");
+            } else {
+                System.out.println("❌ Could not add student. Please try again.");
+            }
             e.printStackTrace();
         }
     }
@@ -35,9 +44,7 @@ public class StudentDAO {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT * FROM students";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Student student = new Student(
@@ -52,6 +59,7 @@ public class StudentDAO {
             }
 
         } catch (SQLException e) {
+            System.out.println("❌ Failed to fetch students from the database.");
             e.printStackTrace();
         }
         return students;
@@ -61,8 +69,7 @@ public class StudentDAO {
     public void updateStudent(Student student) {
         String sql = "UPDATE students SET name=?, email=?, phone=?, dob=?, address=? WHERE id=?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, student.getName());
             stmt.setString(2, student.getEmail());
@@ -75,6 +82,7 @@ public class StudentDAO {
             System.out.println("✅ Student updated successfully!");
 
         } catch (SQLException e) {
+            System.out.println("❌ Could not update student. Please check the ID and try again.");
             e.printStackTrace();
         }
     }
@@ -83,14 +91,14 @@ public class StudentDAO {
     public void deleteStudent(int id) {
         String sql = "DELETE FROM students WHERE id=?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
             stmt.executeUpdate();
             System.out.println("✅ Student deleted successfully!");
 
         } catch (SQLException e) {
+            System.out.println("❌ Could not delete student. Please check the ID.");
             e.printStackTrace();
         }
     }
@@ -100,8 +108,7 @@ public class StudentDAO {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT * FROM students WHERE name LIKE ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, "%" + name + "%");
             try (ResultSet rs = stmt.executeQuery()) {
@@ -118,9 +125,36 @@ public class StudentDAO {
                 }
             }
         } catch (SQLException e) {
+            System.out.println("❌ Failed to search students by name.");
             e.printStackTrace();
         }
         return students;
     }
+
+    public Student getStudentById(int id) {
+    String sql = "SELECT * FROM students WHERE id=?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setInt(1, id);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return new Student(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getDate("dob"),
+                        rs.getString("address")
+                );
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("❌ Failed to fetch student by ID.");
+        e.printStackTrace();
+    }
+    return null;
+}
+
 
 }
