@@ -132,29 +132,27 @@ public class StudentDAO {
     }
 
     public Student getStudentById(int id) {
-    String sql = "SELECT * FROM students WHERE id=?";
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM students WHERE id=?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        stmt.setInt(1, id);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return new Student(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getDate("dob"),
-                        rs.getString("address")
-                );
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Student(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getDate("dob"),
+                            rs.getString("address")
+                    );
+                }
             }
+        } catch (SQLException e) {
+            System.out.println("❌ Failed to fetch student by ID.");
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        System.out.println("❌ Failed to fetch student by ID.");
-        e.printStackTrace();
+        return null;
     }
-    return null;
-}
-
 
 }

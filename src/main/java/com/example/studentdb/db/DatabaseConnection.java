@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DatabaseConnection {
+
     private static final Properties props = new Properties();
 
     static {

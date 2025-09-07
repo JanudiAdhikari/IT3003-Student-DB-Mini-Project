@@ -125,9 +125,12 @@ public class StudentApp {
             return;
         }
 
-        System.out.print("Enter new DOB (yyyy-mm-dd): ");
+        System.out.print("Enter DOB (yyyy-mm-dd): ");
         String dobInput = scanner.nextLine();
-        Date dob = Date.valueOf(dobInput);
+        Date dob = parseDate(dobInput);
+        if (dob == null) {
+            return;
+        }
 
         System.out.print("Enter new address: ");
         String address = scanner.nextLine();
