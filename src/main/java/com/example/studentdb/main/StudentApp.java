@@ -4,13 +4,29 @@ import com.example.studentdb.dao.StudentDAO;
 import com.example.studentdb.model.Student;
 
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class StudentApp {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final StudentDAO studentDAO = new StudentDAO();
+
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+
+    private static Date parseDate(String input) {
+        try {
+            java.util.Date utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(input);
+            return new Date(utilDate.getTime());
+        } catch (ParseException e) {
+            System.out.println("❌ Invalid date format! Please use yyyy-mm-dd.");
+            return null;
+        }
+    }
 
     public static void main(String[] args) {
         while (true) {
@@ -19,7 +35,8 @@ public class StudentApp {
             System.out.println("2. View All Students");
             System.out.println("3. Update Student");
             System.out.println("4. Delete Student");
-            System.out.println("5. Exit");
+            System.out.println("5. Search Student by Name");
+            System.out.println("6. Exit");
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
@@ -30,7 +47,8 @@ public class StudentApp {
                 case 2 -> viewStudents();
                 case 3 -> updateStudent();
                 case 4 -> deleteStudent();
-                case 5 -> {
+                case 5 -> searchStudentByName();
+                case 6 -> {
                     System.out.println("👋 Exiting...");
                     return;
                 }
@@ -42,13 +60,22 @@ public class StudentApp {
     private static void addStudent() {
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
+
         System.out.print("Enter email: ");
         String email = scanner.nextLine();
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            System.out.println("❌ Invalid email format!");
+            return;
+        }
+
         System.out.print("Enter phone: ");
         String phone = scanner.nextLine();
+
         System.out.print("Enter DOB (yyyy-mm-dd): ");
         String dobInput = scanner.nextLine();
-        Date dob = Date.valueOf(dobInput);
+        Date dob = parseDate(dobInput);
+        if (dob == null) return;
+
         System.out.print("Enter address: ");
         String address = scanner.nextLine();
 
@@ -91,4 +118,16 @@ public class StudentApp {
         int id = scanner.nextInt();
         studentDAO.deleteStudent(id);
     }
+
+    private static void searchStudentByName() {
+        System.out.print("Enter name to search: ");
+        String name = scanner.nextLine();
+        List<Student> students = studentDAO.findStudentsByName(name);
+        if (students.isEmpty()) {
+            System.out.println("⚠️ No students found with that name.");
+        } else {
+            students.forEach(System.out::println);
+        }
+    }
+
 }

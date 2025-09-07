@@ -94,4 +94,33 @@ public class StudentDAO {
             e.printStackTrace();
         }
     }
+
+    // SEARCH: Find students by name (partial match)
+    public List<Student> findStudentsByName(String name) {
+        List<Student> students = new ArrayList<>();
+        String sql = "SELECT * FROM students WHERE name LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, "%" + name + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Student student = new Student(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getDate("dob"),
+                            rs.getString("address")
+                    );
+                    students.add(student);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return students;
+    }
+
 }
