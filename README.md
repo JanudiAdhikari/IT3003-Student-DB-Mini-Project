@@ -33,6 +33,7 @@ IT3003-Student-DB-Mini-Project/
 │ │ ├── dao/StudentDAO.java
 │ │ └── main/StudentApp.java
 │ └── resources/db.properties
+```
 
 ---
 
