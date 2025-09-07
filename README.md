@@ -44,6 +44,7 @@ IT3003-Student-DB-Mini-Project/
    ```sql
    CREATE DATABASE studentdb;
    USE studentdb;
+   ```
 
 4. Create the students table:
    ```sql
@@ -56,13 +57,15 @@ IT3003-Student-DB-Mini-Project/
         address TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+    ```
 
 ---
 
 ## 📥 Clone the Repository
 ```bash
-    git clone https://github.com/JanudiAdhikari/IT3003-Student-DB-Mini-Project.git
-    cd IT3003-Student-DB-Mini-Project
+  git clone https://github.com/JanudiAdhikari/IT3003-Student-DB-Mini-Project.git
+  cd IT3003-Student-DB-Mini-Project
+```
 
 ---
 
@@ -74,8 +77,9 @@ IT3003-Student-DB-Mini-Project/
 
 ### Method 2: Command Line
 ```bash
-    mvn compile
-    mvn exec:java -Dexec.mainClass="com.example.studentdb.main.StudentApp"
+  mvn compile
+  mvn exec:java -Dexec.mainClass="com.example.studentdb.main.StudentApp"
+```
 
 ---
 
